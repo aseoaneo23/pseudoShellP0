@@ -13,3 +13,7 @@ int TrocearCadena(char *cadena, char *trozos[]);
 void authors(char *mod);
 
 void getShellPid(char *mod);
+
+void changeDir(char *path);
+
+void printCurrentDir();

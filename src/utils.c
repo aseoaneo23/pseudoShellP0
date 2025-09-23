@@ -45,6 +45,10 @@ bool procesarEntrada(char *comando)
         authors(trozos[1]);
     else if (strcmp(trozos[0], "getpid") ==0 )
         getShellPid(trozos[1]);
+    else if (strcmp(trozos[0], "chdir") == 0)
+        changeDir(trozos[1]);
+    else if (strcmp(trozos[0], "getcwd") == 0)
+        printCurrentDir();
     else if (strcmp(trozos[0], "exit") == 0 || strcmp(trozos[0], "quit") == 0 || strcmp(trozos[0], "bye") == 0)
         terminado = true;
 
@@ -90,3 +94,22 @@ void getShellPid(char *mod) {
     }
     printf("Pid de shell: %d\n", getpid());
 }
+
+void printCurrentDir() {
+    char cwd[1024];
+    if (getcwd(cwd, sizeof(cwd)) != NULL) {
+        printf("Current working dir: %s\n", cwd);
+    } else {
+        perror("getcwd() error");
+    }
+}
+
+void changeDir(char *path) {
+    if (path == NULL) {
+        printCurrentDir();
+        return;
+    }
+    chdir(path);    
+
+}
+
