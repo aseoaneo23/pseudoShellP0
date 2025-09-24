@@ -17,3 +17,12 @@ void getShellPid(char *mod);
 void changeDir(char *path);
 
 void printCurrentDir();
+
+void infosys(char *mod);
+
+void helpCmd(char *mod);
+
+void dateCmd(char *mod);
+
+void hourCmd(char *mod);
+
