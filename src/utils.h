@@ -1,12 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include "lista_comandos.h"
 
 void imprimirPrompt();
 
 void leerEntrada(char *comando);
 
-bool procesarEntrada(char *comando);
+bool procesarEntrada(char *comando, tList historical);
 
 int TrocearCadena(char *cadena, char *trozos[]);
 
@@ -17,3 +18,9 @@ void getShellPid(char *mod);
 void changeDir(char *path);
 
 void printCurrentDir();
+
+void createList();
+
+void manageHistorical(tList *historical, char *command);
+
+void printHistorical(tList historical);

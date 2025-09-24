@@ -52,6 +52,7 @@ bool insertItem(tItemL d, tPosL p, tList *L){
             tPosL actual;
             if(p == LNULL){
                 actual = last(*L);
+                printf("El último dato que había es: %s", actual);
                 actual->nextnodo = nuevo;
             }else{
                 if(p == *L){

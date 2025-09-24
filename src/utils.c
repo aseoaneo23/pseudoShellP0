@@ -5,8 +5,34 @@
 #include <string.h>
 
 #include "utils.h"
+#include "lista_comandos.h"
 
 #define MAX_HOST_LENGTH 256
+
+/*
+struct cmd {
+    char *nombre;
+    void (*func)(char **args);
+};
+
+struct cmd comandos[] = {
+    {"authors", authors},
+    {"getpid", getShellPid},
+    {"chdir", changeDir},
+    {"getcwd", printCurrentDir},
+    {"historic", printHistorical},
+    {NULL, NULL}
+
+procesar_entrada(char *trozos[]) {
+for int i = 0; comandos[i].nombre != NULL; i++) {
+    if (!strcmp(trozos[0], comandos[i].nombre)}
+        *comandos[i].func(trozos ++);
+        return;
+    }
+    
+Tener en cuenta que se están mandando todos los argumentos de los comandos    
+*/
+
 
 void imprimirPrompt()
 {
@@ -28,9 +54,12 @@ void leerEntrada(char *comando)
     fgets(comando, 100, stdin);
 }
 
-bool procesarEntrada(char *comando)
+bool procesarEntrada(char *comando, tList historical)
 {
     bool terminado = false;
+
+    printf("Se va a añadir el comando al histórico: %s\n", comando);
+    manageHistorical(&historical, comando);
 
     char **trozos = malloc(10 * sizeof(char *));
     int num_trozos = TrocearCadena(comando, trozos);
@@ -49,6 +78,8 @@ bool procesarEntrada(char *comando)
         changeDir(trozos[1]);
     else if (strcmp(trozos[0], "getcwd") == 0)
         printCurrentDir();
+    else if (strcmp(trozos[0], "historic") == 0)
+        printHistorical(historical);
     else if (strcmp(trozos[0], "exit") == 0 || strcmp(trozos[0], "quit") == 0 || strcmp(trozos[0], "bye") == 0)
         terminado = true;
 
@@ -100,7 +131,7 @@ void printCurrentDir() {
     if (getcwd(cwd, sizeof(cwd)) != NULL) {
         printf("Current working dir: %s\n", cwd);
     } else {
-        perror("getcwd() error");
+        perror("\ngetcwd() error");
     }
 }
 
@@ -109,7 +140,28 @@ void changeDir(char *path) {
         printCurrentDir();
         return;
     }
-    chdir(path);    
+    int result = chdir(path);
 
+    if (result != 0) {
+        perror("Imposible cambiar de directorio");
+    }
+
+}
+
+void manageHistorical(tList *historical, char *command) {
+    printf("Añadiendo comando a histórico: %s\n", command);
+    tItemL item;
+    strcpy(item.text, command);
+    insertItem(item, LNULL, historical);
+}
+
+void printHistorical(tList historical) {
+    tPosL pos = first(historical);
+    int index = 1;
+    while (pos != LNULL) {
+        printf("%d: %s\n", index, pos->info.text);
+        pos = next(pos, historical);
+        index++;
+    }
 }
 
