@@ -17,7 +17,7 @@ int main()
         char *comando = (char*)malloc(MAX_LENGTH * sizeof(char));
         imprimirPrompt();
         leerEntrada(comando);
-        terminado = procesarEntrada(comando, historical);
+        terminado = procesarEntrada(comando, &historical);
         
         free(comando);
     }
