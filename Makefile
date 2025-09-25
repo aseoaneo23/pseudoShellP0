@@ -2,6 +2,7 @@ CC = gcc
 CFLAGS = -Wall
 DEB = gdb
 DEBFLAGS = -g -O0
+VALGRIND = valgrind --leak-check=full --show-reachable=yes p0.out
 
 SRC = ./src/p0.c
 OBJ = p0.out
@@ -26,4 +27,4 @@ debug:
 
 # Compilacion del programa
 $(OBJ): $(SRC) $(COM)
-	$(CC) $(CFLAGS) -o $(OBJ) $(SRC) $(COM) $(LIB)
+	$(CC) $(CFLAGS) -o $(OBJ) $(SRC) $(COM) $(LIB) 

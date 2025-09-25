@@ -17,10 +17,6 @@
 /*  Write your code here...  */
 typedef char* tItemL;
 
-struct tItemL {
-    char text[500];
-};
-
 #define LNULL NULL
 
 typedef struct tNode *tPosL;

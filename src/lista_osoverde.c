@@ -62,9 +62,9 @@ bool insertItem(tItemL d, tPosL p, tList *L) {
     tPosL q;
     if (!createNode(&q)) {
         // Si el nodo no se pudo crear devuelve false
-        aux = true;
+        aux = false;
     } else {
-        q->data = d;
+        q->data = strdup(d);
         q->next = LNULL;
         if (isEmptyList(*L)) {
             // Si la lista esta vacia crea el nodo y lo añade manualmente

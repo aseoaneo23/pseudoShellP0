@@ -89,6 +89,8 @@ bool procesarEntrada(char *comando, tList *historical)
         helpCmd(trozos[1]);
     else if (strcmp(trozos[0], "infosys") == 0)
         infosys(trozos[1]);
+    else
+        printf("El comando %s no está definido.\n", trozos[0]);
     // else if (strcmp(trozos[0], "date") == 0)
     //     //dateCmd(trozos[1]);
     // else if (strcmp(trozos[0], "hour") == 0)
@@ -162,16 +164,17 @@ void changeDir(char *path) {
 }
 
 void updateHistorical(tList *historical, char *command) {
-    tItemL item = (tItemL)malloc(TOPE * sizeof(char));
-    strncpy(item, command, TOPE);
-    insertItem(item, LNULL, historical);
+     tItemL item = (tItemL)malloc((strlen(command) + 1) * sizeof(char));
+    strcpy(item, command);
+    bool insertado = insertItem(item, LNULL, historical);
+    printf("Comando %s insertado en el historial: %s\n", insertado ? "" : "no", command);
 }
 
 void printHistorical(tList historical) {
     tPosL pos = first(historical);
     int index = 1;
     while (pos != LNULL) {
-        printf("%d: %s", index, getItem(pos, historical));
+        printf("%d: %s\n", index, getItem(pos, historical));
         pos = next(pos, historical);
         index++;
     }
