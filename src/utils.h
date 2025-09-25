@@ -32,5 +32,16 @@ void helpCmd(char *mod);
 
 void dateCmd(char *mod);
 
-void hourCmd(char *mod);
+void closeCmd(char *mod);
+
+void dupCmd(char *mod);
+
+void ListaFichAbiertos(void);
+
+void EliminarFichAbiertos(int fd);
+
+char *NameFicheroDescriptor(int fd);
+
+void AnadirFicherosAbiertos(int fd, const char *nombre, int flags);
+
 

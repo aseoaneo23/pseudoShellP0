@@ -5,6 +5,9 @@
 #include <string.h>
 #include <time.h>
 #include <sys/utsname.h>
+#include <fcntl.h>
+#include <errno.h>
+
 
 
 #include "utils.h"
@@ -33,8 +36,8 @@ for int i = 0; comandos[i].nombre != NULL; i++) {
         *comandos[i].func(trozos ++);
         return;
     }
-    
-Tener en cuenta que se están mandando todos los argumentos de los comandos    
+
+Tener en cuenta que se están mandando todos los argumentos de los comandos
 */
 
 
@@ -89,12 +92,12 @@ bool procesarEntrada(char *comando, tList *historical)
         helpCmd(trozos[1]);
     else if (strcmp(trozos[0], "infosys") == 0)
         infosys(trozos[1]);
-    else
-        printf("El comando %s no está definido.\n", trozos[0]);
-    // else if (strcmp(trozos[0], "date") == 0)
-    //     //dateCmd(trozos[1]);
-    // else if (strcmp(trozos[0], "hour") == 0)
-    //     hourCmd(trozos[1]);
+    else if (strcmp(trozos[0], "date") == 0)
+        dateCmd(trozos[1]);
+    else if (strcmp(trozos[0], "close") == 0)
+        closeCmd(trozos[1]);
+    else if (strcmp(trozos[0], "dup") == 0)
+        dupCmd(trozos[1]);
 
 
 
@@ -102,8 +105,7 @@ bool procesarEntrada(char *comando, tList *historical)
     return terminado;
 }
 
-int TrocearCadena(char *cadena, char *trozos[])
-{
+int TrocearCadena(char *cadena, char *trozos[]) {
     int i = 1;
     if ((trozos[0] = strtok(cadena, " \n\t")) == NULL)
         return 0;
@@ -182,50 +184,207 @@ void printHistorical(tList historical) {
 
 void infosys(char *mod) {
     (void)mod;
-    struct utsname sys_info;
+    struct utsname info;
 
-    if (uname(&sys_info) == -1) {
+    if (uname(&info) == -1) {
         printf("Error: no se pudo obtener la información del sistema\n");
         return;
     }
     printf("Información del sistema:\n");
-    printf("Sistema Operativo: %s\n", sys_info.sysname);
-    printf("Nombre del Nodo: %s\n", sys_info.nodename);
-    printf("Versión del Sistema: %s\n", sys_info.version);
-    printf("Release del Sistema: %s\n", sys_info.release);
-    printf("Arquitectura de la Máquina: %s\n", sys_info.machine);
+    printf("Sistema Operativo: %s\n", info.sysname);
+    printf("Nombre del Nodo: %s\n", info.nodename);
+    printf("Versión del Sistema: %s\n", info.version);
+    printf("Release del Sistema: %s\n", info.release);
+    printf("Arquitectura de la Máquina: %s\n", info.machine);
 }
 
-void helpCmd(char *cmd) {
-    if (cmd == NULL) {
+void helpCmd(char *mod) {
+    if (mod == NULL) {
         printf("Lista de comandos disponibles:\n");
         printf("authors [-l|-n]\n");
         printf("getpid [-p]\n");
         printf("chdir [dir]\n");
         printf("getcwd\n");
+        printf("date [-d|-t]\n");
+        printf("hour\n");
+        printf("historic [N|-N|-clear|-count]\n");
+        printf("open [file] [mode]\n");
+        printf("close [df]\n");
+        printf("dup [df]\n");
+        printf("listopen\n");
         printf("infosys\n");
         printf("help [cmd]\n");
         printf("exit | quit | bye\n");
-    } else if (strcmp(cmd, "authors") == 0) {
+    } else if (strcmp(mod, "authors") == 0) {
         printf("authors [-l|-n]: Muestra los autores. -l logins, -n nombres.\n");
-    } else if (strcmp(cmd, "getpid") == 0) {
+    } else if (strcmp(mod, "getpid") == 0) {
         printf("getpid [-p]: Muestra el pid del shell o el de su padre.\n");
-    } else if (strcmp(cmd, "chdir") == 0) {
+    } else if (strcmp(mod, "chdir") == 0) {
         printf("chdir [dir]: Cambia el directorio actual. Sin argumento lo muestra.\n");
-    } else if (strcmp(cmd, "getcwd") == 0) {
+    } else if (strcmp(mod, "getcwd") == 0) {
         printf("getcwd: Imprime el directorio actual.\n");
-    } else if (strcmp(cmd, "infosys") == 0) {
+    } else if (strcmp(mod, "date") == 0) {
+        printf("date [-d|-t]: Muestra la fecha y la hora actuales. -d solo fecha, -t solo hora.\n");
+    } else if (strcmp(mod, "hour") == 0) {
+        printf("hour: Muestra solo la hora actual (igual que date -t).\n");
+    } else if (strcmp(mod, "historic") == 0) {
+        printf("historic [N|-N|-clear|-count]: Gestiona o muestra el histórico de comandos.\n");
+    } else if (strcmp(mod, "open") == 0) {
+        printf("open [file] [modo]: Abre un fichero (cr, ap, ex, ro, rw, wo, tr). Sin argumentos lista abiertos.\n");
+    } else if (strcmp(mod, "close") == 0) {
+        printf("close [df]: Cierra el descriptor y lo quita de la lista de ficheros abiertos.\n");
+    } else if (strcmp(mod, "dup") == 0) {
+        printf("dup [df]: Duplica el descriptor de fichero y lo añade a la lista.\n");
+    } else if (strcmp(mod, "listopen") == 0) {
+        printf("listopen: Lista los ficheros abiertos (igual que open sin argumentos).\n");
+    } else if (strcmp(mod, "infosys") == 0) {
         printf("infosys: Muestra información básica del sistema.\n");
-    } else if (strcmp(cmd, "help") == 0) {
-        printf("help [cmd]: Muestra todos los comandos o ayuda sobre un comando concreto.\n");
-    } else if (strcmp(cmd, "exit") == 0 || strcmp(cmd, "quit") == 0 || strcmp(cmd, "bye") == 0) {
+    } else if (strcmp(mod, "help") == 0) {
+        printf("help [cmd]: Muestra todos los comandos o la ayuda de un comando concreto.\n");
+    } else if (strcmp(mod, "exit") == 0 || strcmp(mod, "quit") == 0 || strcmp(mod, "bye") == 0) {
         printf("exit | quit | bye: Termina la ejecución del shell.\n");
     } else {
-        printf("No hay ayuda disponible para '%s'\n", cmd);
+        printf("Comando '%s' desconocido en help\n", mod);
     }
 }
 
 
+#define TAM_FECHA 20
+#define TAM_HORA 20
+
+void dateCmd(char *mod) {
+    time_t ahora = time(NULL);
+    struct tm *lt = localtime(&ahora);
+    char fecha[TAM_FECHA];
+    char hora[TAM_HORA];
+
+    if (ahora == (time_t)-1) {
+        perror("time"); return;
+    }
+
+    if (lt == NULL) {
+        perror("localtime");
+        return;
+    }
+
+    if (strftime(fecha, sizeof(fecha), "%d/%m/%Y", lt) == 0)
+        return;
+    if (strftime(hora,  sizeof(hora),  "%H:%M:%S", lt) == 0)
+        return;
+
+    if (mod == NULL) {
+        printf("%s %s\n", fecha, hora);
+    } else if (strcmp(mod, "-d") == 0) {
+        printf("%s\n", fecha);
+    } else if (strcmp(mod, "-t") == 0) {
+        printf("%s\n", hora);
+    } else {
+        printf("Uso: date [-d|-t]\n");
+    }
+}
+
+#define MAX_FICHEROS 100
+#define MAX_NOMBRE 128
+
+typedef struct {
+    int df;
+    char name[MAX_NOMBRE];
+    int modo;
+    int ocupado;
+} Fichero;
+
+Fichero listaFicheros[MAX_FICHEROS];
+
+void ListaFichAbiertos(void) {
+    int aux = 0;
+    for (int i = 0; i < MAX_FICHEROS; i++) {
+        if (listaFicheros[i].ocupado) {
+            printf("fd=%d  nombre=%s  flags=%d\n",
+                   listaFicheros[i].df,
+                   listaFicheros[i].name,
+                   listaFicheros[i].modo);
+            // hay = 1;
+        }
+    }
+    if (aux == -1) {
+        printf("Tabla de ficheros vacía\n");
+    }
+
+}
+
+void EliminarFichAbiertos(int df) {
+    for (int i = 0; i < MAX_FICHEROS; i++) {
+        // if (listaFicheros[i].ocupado && listaFicheros[i].df == fd) {
+            listaFicheros[i].ocupado = 0;
+            return;
+        // }
+    }
+}
+
+char *NameFicheroDescriptor(int df) {
+    for (int i = 0; i < MAX_FICHEROS; i++) {
+        if (listaFicheros[i].ocupado && listaFicheros[i].df == df) {
+            return listaFicheros[i].name;
+        }
+    }
+    return NULL;
+}
+
+void AnadirFicherosAbiertos(int df, const char *name, int modo) {
+    for (int i = 0; i < MAX_FICHEROS; i++) {
+        if (!listaFicheros[i].ocupado) {
+            listaFicheros[i].ocupado=1;
+            listaFicheros[i].df=df ;
+            listaFicheros[i].modo =modo;
+            strncpy(listaFicheros[i].name, name, sizeof(listaFicheros[i].name)-1);
+            listaFicheros[i].name[sizeof(listaFicheros[i].name)-1] = '\0';
+            return;
+        }
+    }
+    printf("La lista está llena, no se pudo registrar el fichero\n");
+}
+
+
+void closeCmd(char *mod) {
+    int df;
+
+    if (mod == NULL || (df = atoi(mod)) < 0) {
+        ListaFichAbiertos();
+        return;
+    }
+
+    if (close(df) == -1) {
+        perror("Imposible cerrar descriptor");
+    } else {
+        EliminarFichAbiertos(df);
+    }
+}
+
+#define MAX_NAME 256
+
+void dupCmd(char *mod) {
+    int df, duplicado;
+    char aux[MAX_NAME];
+    char *p;
+
+    if (mod == NULL || (df = atoi(mod)) < 0) {
+        ListaFichAbiertos();
+        return;
+    }
+    p = NameFicheroDescriptor(df);
+
+    if (p == NULL) p = "sin nombre registrado";
+    duplicado = dup(df);
+
+    if (duplicado == -1) {
+        perror("dup");
+        return;
+    }
+
+    sprintf(aux, "dup %d (%s)", df, p);
+    AnadirFicherosAbiertos(duplicado, aux, fcntl(duplicado, F_GETFL));
+    printf("%d -> %d\n", df, duplicado);
+}
 
 
 
