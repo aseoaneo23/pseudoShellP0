@@ -1,16 +1,7 @@
-/*
- * TITLE: PROGRAMMING II LABS
- * SUBTITLE: Practical 1
- * AUTHOR 1: Sergio López Fontenla LOGIN 1: sergio.lopez.fontenla@udc.es
- * AUTHOR 2: Jorge Neira Cociña LOGIN 2: jorge.neirac@udc.es
- * GROUP: 2.4
- * DATE: 09 / 04 / 2025
- */
 #include "lista.h"
 
 #include <stdio.h>
 
-/* Escribe tu código aquí... */
 
 bool createNode(tPosL *p)
 {

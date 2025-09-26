@@ -1,5 +1,5 @@
 /*Authors:
-Sofía Oubiña Falcón - sofía.oubiña.@udc.es
+Sofía Oubiña Falcón - sofía.oubiña.falcon@udc.es
 Antonio Seoane de Ois - antonio.seoane.deois@udc.gal*/
 
 #include <stdio.h>

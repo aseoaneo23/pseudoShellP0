@@ -111,7 +111,7 @@ void authors(char *mod)
     if (mod == NULL)
     {
         printf("Antonio Seoane: antonio.seoane.deois@udc.es\n");
-        printf("Sofía Oubiña: sofía.oubiña.@udc.es\n");
+        printf("Sofía Oubiña: sofía.oubiña.falcon@udc.es\n");
     }
     else if (strcmp(mod, "-l") == 0)
     {
