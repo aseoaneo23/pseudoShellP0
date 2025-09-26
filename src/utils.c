@@ -24,29 +24,7 @@ static ModMap table[] = {
     {NULL, NO_MOD} // Marcar el final de la tabla
 };
 
-/*
-struct cmd {
-    char *nombre;
-    void (*func)(char **args);
-};
 
-struct cmd comandos[] = {
-    {"authors", authors},
-    {"getpid", getShellPid},
-    {"chdir", changeDir},
-    {"getcwd", printCurrentDir},
-    {"historic", printHistorical},
-    {NULL, NULL}
-
-procesar_entrada(char *trozos[]) {
-for int i = 0; comandos[i].nombre != NULL; i++) {
-    if (!strcmp(trozos[0], comandos[i].nombre)}
-        *comandos[i].func(trozos ++);
-        return;
-    }
-
-Tener en cuenta que se están mandando todos los argumentos de los comandos
-*/
 
 void imprimirPrompt()
 {
@@ -402,7 +380,7 @@ Fichero listaFicheros[MAX_FICHEROS];
 
 void ListaFichAbiertos(void)
 {
-    int aux = 0;
+    int aux = 0;   // 0 = ninguno encontrado todavía
     for (int i = 0; i < MAX_FICHEROS; i++)
     {
         if (listaFicheros[i].ocupado)
@@ -411,23 +389,23 @@ void ListaFichAbiertos(void)
                    listaFicheros[i].df,
                    listaFicheros[i].name,
                    listaFicheros[i].modo);
-            // hay = 1;
+            aux = 1;  // encontramos al menos uno
         }
     }
-    if (aux == -1)
-    {
+    if (aux == 0) {  // si no se encontró ninguno
         printf("Tabla de ficheros vacía\n");
     }
 }
+
 
 void EliminarFichAbiertos(int df)
 {
     for (int i = 0; i < MAX_FICHEROS; i++)
     {
-        // if (listaFicheros[i].ocupado && listaFicheros[i].df == fd) {
+        if (listaFicheros[i].ocupado && listaFicheros[i].df == fd) {
         listaFicheros[i].ocupado = 0;
         return;
-        // }
+        }
     }
 }
 
