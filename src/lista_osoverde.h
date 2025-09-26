@@ -143,4 +143,5 @@ tPosL findItem(tItemL c, tList L);
     Salida: La posicion del PRIMER objeto con ese Id(En caso de no encontrarlo devuelve LNULL).} */
 
 
+void cleanMemory(tList *L);
 #endif

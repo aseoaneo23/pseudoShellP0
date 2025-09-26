@@ -21,4 +21,7 @@ int main()
         
         free(comando);
     }
+
+    cleanListFromMemory(&historical);
+    return 0;
 }

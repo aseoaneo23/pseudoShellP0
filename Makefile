@@ -25,6 +25,9 @@ debug:
 	$(CC) $(DEBFLAGS) $(SRC) $(COM) $(LIB)
 	$(DEB) a.out
 
+valgrind:
+	 valgrind --leak-check=full --show-reachable=yes ./p0.out
+
 # Compilacion del programa
 $(OBJ): $(SRC) $(COM)
 	$(CC) $(CFLAGS) -o $(OBJ) $(SRC) $(COM) $(LIB) 

@@ -4,6 +4,23 @@
 // #include "lista_comandos.h"
 #include "lista_osoverde.h"
 
+typedef enum
+{
+    N,
+    LAST_N,
+    COUNT,
+    CLEAR,
+    NO_MOD
+} MOD;
+
+typedef struct
+{
+    const char *flag;
+    MOD modifier;
+
+} ModMap;
+
+
 void imprimirPrompt();
 
 void leerEntrada(char *comando);
@@ -26,6 +43,8 @@ void updateHistorical(tList *historical, char *command);
 
 void printHistorical(tList historical);
 
+void customHistoricalPrint(MOD type, char *mod, tList historical);
+
 void infosys(char *mod);
 
 void helpCmd(char *mod);
@@ -43,5 +62,11 @@ void EliminarFichAbiertos(int fd);
 char *NameFicheroDescriptor(int fd);
 
 void AnadirFicherosAbiertos(int fd, const char *nombre, int flags);
+
+void cleanListFromMemory(tList *L);
+
+MOD identifyModifier(char *mod);
+
+void manageHistoricalWMods(char *mod, tList *historical);
 
 
