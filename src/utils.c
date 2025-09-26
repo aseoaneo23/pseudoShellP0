@@ -10,19 +10,18 @@
 #include <ctype.h>
 
 #include "utils.h"
-// #include "lista_comandos.h"
-#include "lista_osoverde.h"
+#include "lista.h"
 
 #define MAX_HOST_LENGTH 256
 #define TOPE 500
 
-static ModMap table[] = {
-    {"N", N},
-    {"-N", LAST_N},
-    {"-count", COUNT},
-    {"-clear", CLEAR},
-    {NULL, NO_MOD} // Marcar el final de la tabla
-};
+// static ModMap table[] = {
+//     {"N", N},
+//     {"-N", LAST_N},
+//     {"-count", COUNT},
+//     {"-clear", CLEAR},
+//     {NULL, NO_MOD} // Marcar el final de la tabla
+// };
 
 
 
@@ -164,16 +163,16 @@ void changeDir(char *path)
     }
 }
 
-void updateHistorical(tList *historical, char *command)
+bool updateHistorical(tList *historical, char *command)
 {
     if (strcmp(command, "\n") == 0)
-        return;
+        return false;
         
     tItemL item = (tItemL)malloc((strlen(command) + 1) * sizeof(char));
     strcpy(item, command);
     bool insertado = insertItem(item, LNULL, historical);
-    printf("Comando %sinsertado en el historial: %s\n", insertado ? "" : "no ", command);
     free(item);
+    return insertado;
 }
 
 void printHistorical(tList historical)
@@ -402,7 +401,7 @@ void EliminarFichAbiertos(int df)
 {
     for (int i = 0; i < MAX_FICHEROS; i++)
     {
-        if (listaFicheros[i].ocupado && listaFicheros[i].df == fd) {
+        if (listaFicheros[i].ocupado && listaFicheros[i].df == df) {
         listaFicheros[i].ocupado = 0;
         return;
         }

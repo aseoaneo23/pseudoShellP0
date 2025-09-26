@@ -1,3 +1,7 @@
+/*Authors:
+Sofía Oubiña Falcón - sofía.oubiña.@udc.es
+Antonio Seoane de Ois - antonio.seoane.deois@udc.gal*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>

@@ -5,8 +5,8 @@ DEBFLAGS = -g -O0
 VALGRIND = valgrind --leak-check=full --show-reachable=yes p0.out
 
 SRC = ./src/p0.c
-OBJ = p0.out
-LIB = ./src/lista_osoverde.c
+OBJ = a.out
+LIB = ./src/lista.c
 
 COM = ./src/utils.c
 

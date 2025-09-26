@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 // #include "lista_comandos.h"
-#include "lista_osoverde.h"
+#include "lista.h"
 
 typedef enum
 {
@@ -39,7 +39,7 @@ void printCurrentDir();
 
 void createList();
 
-void updateHistorical(tList *historical, char *command);
+bool updateHistorical(tList *historical, char *command);
 
 void printHistorical(tList historical);
 

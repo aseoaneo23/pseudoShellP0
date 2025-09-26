@@ -6,7 +6,7 @@
  * GROUP: 2.4
  * DATE: 09 / 04 / 2025
  */
-#include "lista_osoverde.h"
+#include "lista.h"
 
 #include <stdio.h>
 
@@ -43,7 +43,7 @@ tPosL last(tList L)
     return p;
 }
 
-tPosL next(tPosL p, tList L)
+tPosL next(tPosL p, tList c)
 {
     return p->next;
 }
