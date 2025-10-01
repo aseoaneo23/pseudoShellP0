@@ -43,4 +43,8 @@ tPosL findItem(tItemL c, tList L);
 
 void cleanMemory(tList *L);
 
+int countItems (tList *L);
+
+tPosL findItemByOffset(tPosL initPos, int offset, tList list);
+
 #endif

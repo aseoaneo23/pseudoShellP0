@@ -8,22 +8,13 @@
 #include <fcntl.h>
 #include <errno.h>
 #include <ctype.h>
+#include <regex.h>
 
 #include "utils.h"
 #include "lista.h"
 
 #define MAX_HOST_LENGTH 256
 #define TOPE 500
-
-// static ModMap table[] = {
-//     {"N", N},
-//     {"-N", LAST_N},
-//     {"-count", COUNT},
-//     {"-clear", CLEAR},
-//     {NULL, NO_MOD} // Marcar el final de la tabla
-// };
-
-
 
 void imprimirPrompt()
 {
@@ -50,8 +41,9 @@ bool procesarEntrada(char *comando, tList *historical)
 {
 
     bool terminado = false;
+    int *listCount = 0;
 
-    updateHistorical(historical, comando);
+    updateHistorical(historical, comando, listCount);
 
     char **trozos = malloc(10 * sizeof(char *));
     int num_trozos = TrocearCadena(comando, trozos);
@@ -75,6 +67,8 @@ bool procesarEntrada(char *comando, tList *historical)
             printHistorical(*historical);
         else
             manageHistoricalWMods(trozos[1], historical);
+    else if (strcmp(trozos[0], "open"));
+        //Lógica open
     else if (strcmp(trozos[0], "exit") == 0 || strcmp(trozos[0], "quit") == 0 || strcmp(trozos[0], "bye") == 0)
         terminado = true;
     else if (strcmp(trozos[0], "help") == 0)
@@ -163,11 +157,11 @@ void changeDir(char *path)
     }
 }
 
-bool updateHistorical(tList *historical, char *command)
+bool updateHistorical(tList *historical, char *command, int *listCount)
 {
     if (strcmp(command, "\n") == 0)
         return false;
-        
+
     tItemL item = (tItemL)malloc((strlen(command) + 1) * sizeof(char));
     strcpy(item, command);
     bool insertado = insertItem(item, LNULL, historical);
@@ -181,41 +175,51 @@ void printHistorical(tList historical)
     int i = 1;
     while (pos != LNULL)
     {
-        printf("%d: %s\n", i, getItem(pos, historical));
+        printf("%d->%s\n", i, getItem(pos, historical));
         pos = next(pos, historical);
         i++;
     }
 }
 
-void customHistoricalPrint(MOD type, char *mod, tList historical) {
+void customHistoricalPrint(MOD type, char *mod, tList historical)
+{
+    tPosL p = historical;
+    int extractedDigit = extractDigit(mod, type), i = 1, totalItems, offset;
+    tPosL lastElement = last(historical);
 
-    tPosL pos = historical;
-    int i = 1;
-    int cmdAt = atoi(mod);
-    printf("Mostrando comando %d del historial:\n", cmdAt);
-    if (type == N) {
-        while (i < cmdAt && pos != LNULL) {
-            pos = next(pos, historical);
+    if (type == N)
+    {
+        while (i < extractedDigit && p != LNULL && p != lastElement)
+        {
+            p = next(p, historical);
             i++;
         }
 
-        tItemL command = getItem(pos, historical);
-        printf("Ejecutando comando %s: ", command);
-        
-        if (command != NULL) {
+        tItemL command = getItem(p, historical);
+
+        if (command != NULL)
+        {
             procesarEntrada(command, &historical);
-        } else {
-            printf("No hay comando en la posición %d del historial.\n", cmdAt);
         }
-    } else if (type == LAST_N) {
-        int lastN = atoi(mod + 1); // Saltar el '-' inicial
-        tPosL lastPos = last(historical);
-        while (lastN > 1 && lastPos != LNULL) {
-            printf("%d: %s\n", lastN, getItem(lastPos, historical));
-            lastPos = previous(lastPos, historical);
-            lastN--;
+        else
+        {
+            printf("No hay comando en la posición %d del historial.\n", extractedDigit);
+        }
+    }
+    else
+    {
+        totalItems = countItems(&historical);
+        offset = totalItems - extractedDigit;
+
+        p = findItemByOffset(first(historical), offset, historical);
+
+        while (p != LNULL && extractedDigit > 0)
+        {
+            printf("%d: %s\n", offset + 1 , getItem(p, historical));
+            p = next(p, historical);
+            offset ++;
+            extractedDigit--;
         };
-        
     }
 }
 
@@ -379,7 +383,7 @@ Fichero listaFicheros[MAX_FICHEROS];
 
 void ListaFichAbiertos(void)
 {
-    int aux = 0;   // 0 = ninguno encontrado todavía
+    int aux = 0; // 0 = ninguno encontrado todavía
     for (int i = 0; i < MAX_FICHEROS; i++)
     {
         if (listaFicheros[i].ocupado)
@@ -388,22 +392,23 @@ void ListaFichAbiertos(void)
                    listaFicheros[i].df,
                    listaFicheros[i].name,
                    listaFicheros[i].modo);
-            aux = 1;  // encontramos al menos uno
+            aux = 1; // encontramos al menos uno
         }
     }
-    if (aux == 0) {  // si no se encontró ninguno
+    if (aux == 0)
+    { // si no se encontró ninguno
         printf("Tabla de ficheros vacía\n");
     }
 }
-
 
 void EliminarFichAbiertos(int df)
 {
     for (int i = 0; i < MAX_FICHEROS; i++)
     {
-        if (listaFicheros[i].ocupado && listaFicheros[i].df == df) {
-        listaFicheros[i].ocupado = 0;
-        return;
+        if (listaFicheros[i].ocupado && listaFicheros[i].df == df)
+        {
+            listaFicheros[i].ocupado = 0;
+            return;
         }
     }
 }
@@ -489,37 +494,71 @@ void dupCmd(char *mod)
 
 MOD identifyModifier(char *mod)
 {
-    int indexOfHistoric = atoi(mod);
-    if (isdigit(mod[0]) && indexOfHistoric > 0)
-        return N;
-    else if (mod[0] == '-' && isdigit(mod[1]) && indexOfHistoric > 0)
-        return LAST_N;
-    else if (strcmp(mod, "-count") == 0)
-        return COUNT;
-    else if (strcmp(mod, "-clear") == 0)
-        return CLEAR;
-    else
-        return NO_MOD;
+    regex_t regex;
+    char *permittedMod = "-[0-9]{1,2}";
+    int reti;
+
+    reti = regcomp(&regex, permittedMod, REG_EXTENDED);
+    reti = regexec(&regex, mod, 0, NULL, 0);
+
+    if (*mod == '-')
+    {
+        if (strcmp(mod, "-clear") == 0)
+            return CLEAR;
+        else if (strcmp(mod, "-count") == 0)
+            return COUNT;
+        else if (!reti)
+            return LAST_N;
+        else if (!isdigit(mod[1]))
+        {
+            printf("Modificador no reconocido!: %c", mod[1]);
+            return NO_MOD;
+        }
+    }
+
+    return N;
 }
 
-void manageHistoricalWMods(char *mod, tList *historical) {
+int extractDigit(char *mod, MOD modifierType)
+{
+    int i = (modifierType == N) ? 0 : 1, retDigit = 0, j = 0;
+    size_t modLength = strlen(mod);
+    char *digit = malloc((modLength + 1) * sizeof(char));
+
+    while (mod[i] != '\0' && isdigit(mod[i]))
+    {
+        digit[j++] = mod[i];
+        i++;
+    }
+
+    digit[j] = '\n';
+
+    retDigit = atoi(digit);
+    free(digit);
+
+    return retDigit;
+}
+
+void manageHistoricalWMods(char *mod, tList *historical)
+{
     MOD selectedMod = identifyModifier(mod);
 
-    switch (selectedMod) {
-        case N:
-        case LAST_N:
-            customHistoricalPrint(selectedMod, mod, *historical);
-            break;
-        case COUNT:
-            // Implementar lógica para -count
-            break;
-        case CLEAR:
-            cleanListFromMemory(historical);
-            createEmptyList(historical);
-            printf("Historial limpiado\n");
-            break;
-        default:
-            printf("Modificador no manejado\n");
-            break;
+    switch (selectedMod)
+    {
+    case N:
+    case LAST_N:
+        customHistoricalPrint(selectedMod, mod, *historical);
+        break;
+    case COUNT:
+        printf("Total de elementos en el histórico: %d\n", countItems(historical));
+        break;
+    case CLEAR:
+        cleanListFromMemory(historical);
+        createEmptyList(historical);
+        printf("Historial limpiado\n");
+        break;
+    default:
+        printf("Modificador permitido\n");
+        break;
     }
 }

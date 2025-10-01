@@ -2,7 +2,6 @@
 
 #include <stdio.h>
 
-
 bool createNode(tPosL *p)
 {
     *p = (tPosL)malloc(sizeof(struct tNode));
@@ -153,6 +152,32 @@ tPosL findItem(tItemL c, tList L)
     return p;
 }
 
+// Devuelve la posición de un elemento de la lista partiendo de initPos y desplazándose offset-posiciones.
+tPosL findItemByOffset(tPosL initPos, int offset, tList list)
+{
+    int i = 0;
+    tPosL desiredP = initPos;
+
+    if (offset < 0 )
+    {
+        while (i > offset && desiredP != first(list))
+        {
+            desiredP = previous(desiredP, list);
+            i--;
+        }
+    }
+    else if (offset > 0)
+    {
+        while (i < offset && desiredP != last(list))
+        {
+            desiredP = next(desiredP, list);
+            i++;
+        }
+    }
+
+    return desiredP;
+}
+
 void cleanListFromMemory(tList *L)
 {
     tPosL p;
@@ -161,5 +186,21 @@ void cleanListFromMemory(tList *L)
         p = *L;
         *L = next(p, *L);
         free(p->data);
-        free(p);}
+        free(p);
+    }
+}
+
+int countItems(tList *L)
+{
+    tPosL pi = first(*L);
+    tPosL lastItem = last(*L);
+    int count = 0;
+
+    while (pi != lastItem)
+    {
+        pi = pi->next;
+        count++;
+    }
+
+    return count + 1;
 }

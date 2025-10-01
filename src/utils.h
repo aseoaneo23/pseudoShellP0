@@ -13,14 +13,6 @@ typedef enum
     NO_MOD
 } MOD;
 
-typedef struct
-{
-    const char *flag;
-    MOD modifier;
-
-} ModMap;
-
-
 void imprimirPrompt();
 
 void leerEntrada(char *comando);
@@ -39,7 +31,7 @@ void printCurrentDir();
 
 void createList();
 
-bool updateHistorical(tList *historical, char *command);
+bool updateHistorical(tList *historical, char *command, int *listCount);
 
 void printHistorical(tList historical);
 
@@ -68,5 +60,7 @@ void cleanListFromMemory(tList *L);
 MOD identifyModifier(char *mod);
 
 void manageHistoricalWMods(char *mod, tList *historical);
+
+int extractDigit (char *mod, MOD modifierType);
 
 
